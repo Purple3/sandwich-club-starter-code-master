@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.udacity.sandwichclub.model.Sandwich;
 import com.udacity.sandwichclub.utils.JsonUtils;
 
@@ -26,13 +27,12 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        ImageView ingredientsIv = findViewById(R.id.image_iv);
-        TextView originTv = findViewById(R.id.origin_tv);
+        ImageView imageIv = findViewById(R.id.image_iv);
 
         Intent intent = getIntent();
         if (intent == null) {
-           // closeOnError();
-          //  ingredientsIv.;
+            closeOnError();
+
         }
 
         int position = intent.getIntExtra(EXTRA_POSITION, DEFAULT_POSITION);
@@ -49,10 +49,6 @@ public class DetailActivity extends AppCompatActivity {
         Sandwich sandwich = null;
         try {
             sandwich = JsonUtils.parseSandwichJson(json);
-            Log.e("sandwich", sandwich.getMainName());
-            originTv.setText(sandwich.getPlaceOfOrigin());
-            Log.e("placeoforigin", sandwich.getPlaceOfOrigin());
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -65,7 +61,7 @@ public class DetailActivity extends AppCompatActivity {
         populateUI(sandwich);
         Picasso.with(this)
                 .load(sandwich.getImage())
-                .into(ingredientsIv);
+                .into(imageIv);
 
         setTitle(sandwich.getMainName());
     }
@@ -76,8 +72,38 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void populateUI(Sandwich sandwich) {
+
+        TextView alsoKnowAsTv = findViewById(R.id.also_known_as_tv);
         TextView descriptionTv = findViewById(R.id.description_tv);
 
+        TextView ingredientsIv = findViewById(R.id.ingredients_tv);
+        TextView originTv = findViewById(R.id.origin_tv);
+
+
+        originTv.setText(sandwich.getPlaceOfOrigin());
         descriptionTv.setText(sandwich.getDescription());
+
+        StringBuilder otherNames = new StringBuilder();
+        int numOfOtherNames = 0;
+        for(String otherName :  sandwich.getAlsoKnownAs() ) {
+            numOfOtherNames++;
+            if(numOfOtherNames < sandwich.getAlsoKnownAs().size()) {
+                otherNames.append(otherName).append(", ");
+            }
+        }
+        alsoKnowAsTv.setText(otherNames);
+
+
+        StringBuilder ingredients = new StringBuilder();
+        int numOfIngredients = 0;
+        for(String ingredient :  sandwich.getIngredients() ) {
+            numOfIngredients++;
+            if(numOfIngredients < sandwich.getIngredients().size()){
+                ingredients.append(ingredient).append(", ");
+            }
+
+
+        }
+        ingredientsIv.setText(ingredients);
     }
 }
